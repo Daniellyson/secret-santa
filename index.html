@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Secret Santa</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts & Font Awesome Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#f0fdf4',
+              100: '#dcfce7',
+              400: '#4ade80',
+              500: '#22c55e',
+              600: '#16a34a',
+              700: '#15803d',
+              800: '#166534',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  
+  <style>
+    /* Card flip animation styles for secret mode */
+    .perspective-1000 {
+      perspective: 1000px;
+    }
+    .transform-style-3d {
+      transform-style: preserve-3d;
+    }
+    .backface-hidden {
+      backface-visibility: hidden;
+    }
+    .rotate-y-180 {
+      transform: rotateY(180deg);
+    }
+    
+    /* Christmas Title Styling with stroke border and glowing shadow */
+    .festive-title {
+      -webkit-text-stroke: 2px #ffffff;
+      text-shadow: 
+        0 0 25px rgba(34, 197, 94, 0.7),
+        0 0 10px rgba(239, 68, 68, 0.5),
+        0 6px 18px rgba(0, 0, 0, 0.9);
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.6);
+      border-radius: 8px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 8px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #475569;
+    }
+  </style>
+</head>
+
+<body class="bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-950 text-slate-100 min-h-screen font-sans antialiased selection:bg-brand-500 selection:text-white flex flex-col justify-between overflow-x-hidden relative">
+
+  <!-- Prominent Falling Snow Canvas Overlay (Layered over all components) -->
+  <canvas id="snow-canvas" class="fixed inset-0 pointer-events-none z-30"></canvas>
+
+  <!-- Winter Ambient Background Glow FX -->
+  <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+    <div class="absolute -top-32 left-1/4 w-[500px] h-[500px] bg-indigo-500/15 rounded-full blur-3xl"></div>
+    <div class="absolute top-1/3 -right-32 w-[450px] h-[450px] bg-brand-500/10 rounded-full blur-3xl"></div>
+    <div class="absolute -bottom-32 left-1/3 w-[500px] h-[500px] bg-rose-500/10 rounded-full blur-3xl"></div>
+  </div>
+
+  <div class="relative z-10 max-w-5xl mx-auto px-4 py-8 sm:px-6 lg:px-8 w-full flex-grow">
+    
+    <!-- App Header -->
+    <header class="text-center mb-10">
+      <h1 class="festive-title text-6xl sm:text-7xl lg:text-8xl font-black tracking-tight bg-gradient-to-r from-white via-emerald-400 to-red-500 bg-clip-text text-transparent mb-3 py-2">
+        Secret Santa
+      </h1>
+    </header>
+
+    <!-- Main Grid Layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      
+      <!-- LEFT COLUMN: Input & List Management -->
+      <section class="lg:col-span-5 bg-slate-900/80 backdrop-blur-md border border-slate-700/80 rounded-2xl p-6 shadow-2xl">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-users text-brand-400"></i>
+            Participants
+          </h2>
+          <span id="participant-count" class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-800 text-slate-300 border border-slate-700">
+            0 added
+          </span>
+        </div>
+
+        <!-- Add Input Form -->
+        <form id="add-name-form" class="mb-5">
+          <div class="relative flex items-center">
+            <input 
+              type="text" 
+              id="name-input" 
+              placeholder="Enter a name (e.g., Dan)" 
+              class="w-full bg-slate-950/80 border border-slate-700/80 rounded-xl px-4 py-3 pl-10 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all shadow-inner"
+              autocomplete="off"
+            />
+            <i class="fa-solid fa-user-plus absolute left-3.5 text-slate-400"></i>
+            <button 
+              type="submit" 
+              class="absolute right-2 px-3.5 py-1.5 bg-brand-600 hover:bg-brand-500 text-white font-semibold text-sm rounded-lg transition-all shadow-md active:scale-95"
+            >
+              <span>Add</span>
+            </button>
+          </div>
+          <!-- Validation Message Area -->
+          <p id="input-error" class="text-xs text-rose-400 mt-2 hidden flex items-center gap-1 font-medium">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <span id="input-error-text">Please enter a valid name.</span>
+          </p>
+        </form>
+
+        <!-- List Header -->
+        <div class="flex justify-between items-center text-xs mb-3 text-slate-400 px-1 font-medium">
+          <span>Participant List</span>
+          <button id="clear-all-btn" class="text-rose-400 hover:text-rose-300 transition-colors hidden font-semibold">
+            <i class="fa-solid fa-trash-can mr-1"></i> Clear All
+          </button>
+        </div>
+
+        <!-- Scrollable Names List -->
+        <div id="names-container" class="min-h-[220px] max-h-[320px] overflow-y-auto space-y-2 pr-1">
+          <!-- Empty State -->
+          <div id="empty-state" class="h-48 flex flex-col items-center justify-center text-slate-400 border-2 border-dashed border-slate-700/70 rounded-xl p-4 text-center">
+            <i class="fa-solid fa-user-group text-3xl mb-2 opacity-60 text-indigo-300"></i>
+            <p class="text-sm font-semibold text-slate-300">No participants yet</p>
+            <p class="text-xs text-slate-400 mt-1">Add at least 2 people to draw pairs</p>
+          </div>
+        </div>
+
+        <!-- Draw Button -->
+        <div class="mt-6 pt-4 border-t border-slate-800">
+          <button 
+            id="draw-btn" 
+            disabled 
+            class="w-full py-3.5 px-4 bg-gradient-to-r from-brand-600 to-emerald-500 hover:from-brand-500 hover:to-emerald-400 text-white font-bold rounded-xl shadow-lg shadow-brand-950/40 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none flex items-center justify-center gap-2 text-base active:scale-[0.99]"
+          >
+            <i class="fa-solid fa-shuffle"></i>
+            <span>Draw Secret Santa Pairs</span>
+          </button>
+          <p id="draw-hint" class="text-xs text-slate-400 text-center mt-2 font-medium">
+            Add at least 2 participants to start the draw.
+          </p>
+        </div>
+      </section>
+
+      <!-- RIGHT COLUMN: Draw Results -->
+      <section class="lg:col-span-7 bg-slate-900/80 backdrop-blur-md border border-slate-700/80 rounded-2xl p-6 shadow-2xl flex flex-col justify-between min-h-[480px]">
+        
+        <div>
+          <!-- Results Header & Controls -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 pb-4 border-b border-slate-800">
+            <div>
+              <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                <i class="fa-solid fa-square-poll-vertical text-brand-400"></i>
+                Draw Results
+              </h2>
+              <p class="text-xs text-slate-400 mt-0.5">Matched strictly 1-to-1 with no self-draws</p>
+            </div>
+
+            <!-- Display Mode Switcher -->
+            <div id="results-toggle-container" class="hidden flex items-center bg-slate-950/80 p-1 rounded-xl border border-slate-800 text-xs">
+              <button 
+                id="mode-secret-btn" 
+                class="px-3 py-1.5 rounded-lg font-semibold transition-all text-white bg-brand-600 shadow-sm flex items-center gap-1.5"
+              >
+                <i class="fa-solid fa-eye-slash"></i>
+                <span>Secret Cards</span>
+              </button>
+              <button 
+                id="mode-reveal-btn" 
+                class="px-3 py-1.5 rounded-lg font-semibold transition-all text-slate-400 hover:text-white flex items-center gap-1.5"
+              >
+                <i class="fa-solid fa-list-check"></i>
+                <span>Show All</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Empty Results State -->
+          <div id="results-empty-state" class="h-64 flex flex-col items-center justify-center text-slate-400 text-center">
+            <div class="w-16 h-16 rounded-full bg-slate-800/80 border border-slate-700 flex items-center justify-center mb-3">
+              <i class="fa-solid fa-wand-magic-sparkles text-2xl text-indigo-300"></i>
+            </div>
+            <h3 class="text-base font-semibold text-slate-200">Ready to Draw</h3>
+            <p class="text-xs text-slate-400 max-w-xs mt-1">
+              Add your group list on the left and hit "Draw Secret Santa Pairs" to generate random assignments.
+            </p>
+          </div>
+
+          <!-- Results View Containers -->
+          
+          <!-- 1. Secret Reveal Cards Grid Mode -->
+          <div id="secret-cards-grid" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[400px] overflow-y-auto pr-1">
+            <!-- Cards rendered via JS -->
+          </div>
+
+          <!-- 2. Full Revealed List View Mode -->
+          <div id="revealed-list-view" class="hidden space-y-2.5 max-h-[400px] overflow-y-auto pr-1">
+            <!-- List rows rendered via JS -->
+          </div>
+
+        </div>
+
+        <!-- Export & Copy Footer Tools -->
+        <div id="results-footer" class="hidden pt-5 border-t border-slate-800 mt-6 flex flex-wrap items-center justify-between gap-3">
+          <div class="text-xs text-slate-400 flex items-center gap-1.5">
+            <i class="fa-solid fa-circle-check text-brand-400"></i>
+            <span>Valid 1-to-1 draw complete</span>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button 
+              id="download-image-btn" 
+              class="px-3.5 py-2 bg-brand-600 hover:bg-brand-500 text-white text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5 active:scale-95 shadow-sm"
+            >
+              <i class="fa-solid fa-file-image"></i>
+              <span>Save as Image</span>
+            </button>
+            <button 
+              id="copy-results-btn" 
+              class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5 active:scale-95 shadow-sm"
+            >
+              <i class="fa-solid fa-copy"></i>
+              <span>Copy List</span>
+            </button>
+            <button 
+              id="redraw-btn" 
+              class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5 active:scale-95 shadow-sm"
+            >
+              <i class="fa-solid fa-rotate-right"></i>
+              <span>Reshuffle</span>
+            </button>
+          </div>
+        </div>
+
+      </section>
+
+    </div>
+  </div>
+
+  <!-- Toast Notification Popup -->
+  <div 
+    id="toast" 
+    class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 ease-out bg-slate-900 text-white border border-slate-700 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 pointer-events-none"
+  >
+    <div id="toast-icon" class="w-7 h-7 rounded-full bg-brand-500/20 text-brand-400 flex items-center justify-center text-sm">
+      <i class="fa-solid fa-check"></i>
+    </div>
+    <span id="toast-message" class="text-sm font-medium">Action completed</span>
+  </div>
+
+  <!-- Footer -->
+  <footer class="text-center py-6 text-xs text-slate-400 border-t border-slate-900 mt-12 font-medium relative z-10">
+    Secret Santa Generator &bull; Secure Client-Side Derangement Draw
+  </footer>
+
+  <!-- App JavaScript Logic -->
+  <script>
+    // --- Application State ---
+    const state = {
+      participants: [],
+      pairs: [], // Array of objects: { giver: string, receiver: string, revealed: boolean }
+      viewMode: 'secret' // 'secret' | 'reveal'
+    };
+
+    // --- DOM Elements ---
+    const addForm = document.getElementById('add-name-form');
+    const nameInput = document.getElementById('name-input');
+    const inputError = document.getElementById('input-error');
+    const inputErrorText = document.getElementById('input-error-text');
+    const namesContainer = document.getElementById('names-container');
+    const emptyState = document.getElementById('empty-state');
+    const participantCount = document.getElementById('participant-count');
+    const clearAllBtn = document.getElementById('clear-all-btn');
+    const drawBtn = document.getElementById('draw-btn');
+    const drawHint = document.getElementById('draw-hint');
+
+    const resultsEmptyState = document.getElementById('results-empty-state');
+    const secretCardsGrid = document.getElementById('secret-cards-grid');
+    const revealedListView = document.getElementById('revealed-list-view');
+    const resultsToggleContainer = document.getElementById('results-toggle-container');
+    const modeSecretBtn = document.getElementById('mode-secret-btn');
+    const modeRevealBtn = document.getElementById('mode-reveal-btn');
+    const resultsFooter = document.getElementById('results-footer');
+    const downloadImageBtn = document.getElementById('download-image-btn');
+    const copyResultsBtn = document.getElementById('copy-results-btn');
+    const redrawBtn = document.getElementById('redraw-btn');
+    const toast = document.getElementById('toast');
+    const toastMessage = document.getElementById('toast-message');
+
+    // --- Strict Derangement Draw Algorithm ---
+    function generateDerangement(arr) {
+      if (arr.length < 2) return null;
+
+      const givers = [...arr];
+      let receivers = [...arr];
+      let valid = false;
+      let attempts = 0;
+      const maxAttempts = 500;
+
+      while (!valid && attempts < maxAttempts) {
+        attempts++;
+        for (let i = receivers.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [receivers[i], receivers[j]] = [receivers[j], receivers[i]];
+        }
+
+        valid = true;
+        for (let i = 0; i < givers.length; i++) {
+          if (givers[i] === receivers[i]) {
+            valid = false;
+            break;
+          }
+        }
+      }
+
+      if (!valid) {
+        receivers = [...givers.slice(1), givers[0]];
+      }
+
+      return givers.map((giver, idx) => ({
+        giver: giver,
+        receiver: receivers[idx],
+        revealed: false
+      }));
+    }
+
+    // --- UI Helpers ---
+
+    function showInputError(msg) {
+      inputErrorText.textContent = msg;
+      inputError.classList.remove('hidden');
+      nameInput.classList.add('border-rose-500');
+    }
+
+    function hideInputError() {
+      inputError.classList.add('hidden');
+      nameInput.classList.remove('border-rose-500');
+    }
+
+    function showToast(msg) {
+      toastMessage.textContent = msg;
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 2500);
+    }
+
+    function updateParticipantsUI() {
+      participantCount.textContent = `${state.participants.length} added`;
+      namesContainer.innerHTML = '';
+
+      if (state.participants.length === 0) {
+        namesContainer.appendChild(emptyState);
+        emptyState.classList.remove('hidden');
+        clearAllBtn.classList.add('hidden');
+      } else {
+        emptyState.classList.add('hidden');
+        clearAllBtn.classList.remove('hidden');
+
+        state.participants.forEach((name, index) => {
+          const badge = document.createElement('div');
+          badge.className = "flex items-center justify-between bg-slate-950/70 border border-slate-700/80 px-3.5 py-2.5 rounded-xl group hover:border-slate-500 transition-all";
+          badge.innerHTML = `
+            <div class="flex items-center gap-2.5 overflow-hidden">
+              <span class="w-6 h-6 rounded-full bg-slate-800 text-slate-300 text-xs flex items-center justify-center font-bold flex-shrink-0 border border-slate-700">
+                ${index + 1}
+              </span>
+              <span class="text-sm font-medium text-slate-200 truncate">${escapeHTML(name)}</span>
+            </div>
+            <button 
+              type="button" 
+              onclick="removeParticipant(${index})" 
+              class="text-slate-400 hover:text-rose-400 p-1 transition-colors"
+              title="Remove name"
+            >
+              <i class="fa-solid fa-xmark text-sm"></i>
+            </button>
+          `;
+          namesContainer.appendChild(badge);
+        });
+      }
+
+      if (state.participants.length >= 2) {
+        drawBtn.disabled = false;
+        drawHint.textContent = `Ready! Draw pairs for ${state.participants.length} participants.`;
+        drawHint.className = "text-xs text-brand-400 text-center mt-2 font-medium";
+      } else {
+        drawBtn.disabled = true;
+        drawHint.textContent = "Add at least 2 participants to start the draw.";
+        drawHint.className = "text-xs text-slate-400 text-center mt-2 font-medium";
+      }
+    }
+
+    function renderResultsUI() {
+      if (state.pairs.length === 0) {
+        resultsEmptyState.classList.remove('hidden');
+        secretCardsGrid.classList.add('hidden');
+        revealedListView.classList.add('hidden');
+        resultsToggleContainer.classList.add('hidden');
+        resultsFooter.classList.add('hidden');
+        return;
+      }
+
+      resultsEmptyState.classList.add('hidden');
+      resultsToggleContainer.classList.remove('hidden');
+      resultsFooter.classList.remove('hidden');
+
+      if (state.viewMode === 'secret') {
+        secretCardsGrid.classList.remove('hidden');
+        revealedListView.classList.add('hidden');
+        renderSecretCards();
+      } else {
+        secretCardsGrid.classList.add('hidden');
+        revealedListView.classList.remove('hidden');
+        renderRevealedList();
+      }
+    }
+
+    function renderSecretCards() {
+      secretCardsGrid.innerHTML = '';
+      state.pairs.forEach((pair, idx) => {
+        const card = document.createElement('div');
+        card.className = "perspective-1000 h-28 cursor-pointer select-none";
+        
+        card.innerHTML = `
+          <div id="card-inner-${idx}" class="relative w-full h-full duration-500 transform-style-3d transition-transform ${pair.revealed ? 'rotate-y-180' : ''}">
+            <div class="absolute inset-0 w-full h-full bg-slate-950/90 border border-slate-700/80 rounded-xl p-4 flex flex-col justify-between backface-hidden shadow-md hover:border-brand-500/60 transition-colors">
+              <div class="flex items-center justify-between text-xs text-slate-400">
+                <span class="font-semibold text-slate-200">${escapeHTML(pair.giver)}</span>
+                <span class="bg-slate-800 border border-slate-700 px-2 py-0.5 rounded text-[10px] uppercase font-bold text-slate-300">Tap to reveal</span>
+              </div>
+              <div class="text-center py-1">
+                <i class="fa-solid fa-gift text-2xl text-brand-400 animate-pulse"></i>
+              </div>
+              <div class="text-[11px] text-slate-400 text-center">Gives to ... ?</div>
+            </div>
+
+            <div class="absolute inset-0 w-full h-full bg-slate-900 border border-brand-500/60 rounded-xl p-4 flex flex-col justify-between backface-hidden rotate-y-180 shadow-lg">
+              <div class="flex items-center justify-between text-xs text-slate-400">
+                <span class="font-semibold text-slate-200">${escapeHTML(pair.giver)}</span>
+                <span class="text-brand-400 text-xs"><i class="fa-solid fa-circle-check"></i> Drawn</span>
+              </div>
+              <div class="text-center my-auto">
+                <span class="text-xs text-slate-400 block mb-0.5">Gives a gift to</span>
+                <span class="text-lg font-bold text-brand-400">${escapeHTML(pair.receiver)}</span>
+              </div>
+            </div>
+          </div>
+        `;
+
+        card.addEventListener('click', () => {
+          pair.revealed = !pair.revealed;
+          const inner = document.getElementById(`card-inner-${idx}`);
+          if (inner) {
+            inner.classList.toggle('rotate-y-180', pair.revealed);
+          }
+        });
+
+        secretCardsGrid.appendChild(card);
+      });
+    }
+
+    function renderRevealedList() {
+      revealedListView.innerHTML = '';
+      state.pairs.forEach((pair, idx) => {
+        const row = document.createElement('div');
+        row.className = "flex items-center justify-between bg-slate-950/80 border border-slate-800 px-4 py-3 rounded-xl";
+        row.innerHTML = `
+          <div class="flex items-center gap-3 w-5/12">
+            <span class="w-6 h-6 rounded-full bg-slate-800 text-slate-300 text-xs flex items-center justify-center font-bold flex-shrink-0 border border-slate-700">${idx + 1}</span>
+            <span class="font-semibold text-slate-200 text-sm truncate">${escapeHTML(pair.giver)}</span>
+          </div>
+          
+          <div class="flex items-center justify-center w-2/12 text-brand-400 text-sm">
+            <i class="fa-solid fa-arrow-right-long"></i>
+          </div>
+
+          <div class="flex items-center justify-end gap-2 w-5/12 text-right">
+            <span class="font-bold text-brand-400 text-sm truncate">${escapeHTML(pair.receiver)}</span>
+            <i class="fa-solid fa-gift text-brand-500/70 text-xs"></i>
+          </div>
+        `;
+        revealedListView.appendChild(row);
+      });
+    }
+
+    // --- Logic & Event Handlers ---
+
+    function addParticipant(name) {
+      const trimmed = name.trim();
+      if (!trimmed) {
+        showInputError("Please enter a name.");
+        return;
+      }
+      if (state.participants.some(p => p.toLowerCase() === trimmed.toLowerCase())) {
+        showInputError("This name is already added.");
+        return;
+      }
+
+      hideInputError();
+      state.participants.push(trimmed);
+      nameInput.value = '';
+      updateParticipantsUI();
+    }
+
+    function removeParticipant(index) {
+      state.participants.splice(index, 1);
+      state.pairs = [];
+      updateParticipantsUI();
+      renderResultsUI();
+    }
+
+    function clearAllParticipants() {
+      state.participants = [];
+      state.pairs = [];
+      updateParticipantsUI();
+      renderResultsUI();
+      showToast("Cleared all participants");
+    }
+
+    function performDraw() {
+      if (state.participants.length < 2) return;
+
+      const pairs = generateDerangement(state.participants);
+      if (pairs) {
+        state.pairs = pairs;
+        renderResultsUI();
+        showToast("Secret Santa pairs drawn!");
+      }
+    }
+
+    function copyResultsToClipboard() {
+      if (state.pairs.length === 0) return;
+
+      const lines = state.pairs.map(p => `${p.giver} ➔ ${p.receiver}`);
+      const textToCopy = `🎁 Secret Santa Assignments 🎁\n\n` + lines.join('\n');
+
+      const dummy = document.createElement("textarea");
+      document.body.appendChild(dummy);
+      dummy.value = textToCopy;
+      dummy.select();
+      document.execCommand("copy");
+      document.body.removeChild(dummy);
+
+      showToast("Results copied to clipboard!");
+    }
+
+    // --- Native 2D Canvas Image Exporter ---
+    function exportResultsAsImage() {
+      if (!state.pairs || state.pairs.length === 0) {
+        showToast("No pairs available to export");
+        return;
+      }
+
+      try {
+        const cardWidth = 600;
+        const headerHeight = 110;
+        const rowHeight = 44;
+        const padding = 28;
+        const cardHeight = headerHeight + (state.pairs.length * rowHeight) + padding;
+
+        const canvas = document.createElement('canvas');
+        canvas.width = cardWidth * 2;
+        canvas.height = cardHeight * 2;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          showToast("Canvas context error");
+          return;
+        }
+
+        ctx.scale(2, 2);
+
+        // Background Gradient
+        const bgGradient = ctx.createLinearGradient(0, 0, cardWidth, cardHeight);
+        bgGradient.addColorStop(0, '#0f172a');
+        bgGradient.addColorStop(1, '#1e1b4b');
+        ctx.fillStyle = bgGradient;
+        ctx.fillRect(0, 0, cardWidth, cardHeight);
+
+        // Card Outer Border
+        ctx.strokeStyle = '#334155';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(10, 10, cardWidth - 20, cardHeight - 20);
+
+        // Title
+        ctx.fillStyle = '#22c55e';
+        ctx.font = 'bold 26px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('🎁 Secret Santa Pairings', cardWidth / 2, 54);
+
+        // Subtitle
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '13px sans-serif';
+        ctx.fillText('Official Pairings List', cardWidth / 2, 78);
+
+        // Pair Rows
+        const startY = headerHeight;
+        state.pairs.forEach((pair, idx) => {
+          const y = startY + (idx * rowHeight);
+
+          // Row background box
+          ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+          ctx.strokeStyle = '#334155';
+          ctx.lineWidth = 1;
+          
+          ctx.fillRect(padding, y, cardWidth - (padding * 2), 34);
+          ctx.strokeRect(padding, y, cardWidth - (padding * 2), 34);
+
+          // Giver text
+          ctx.textAlign = 'left';
+          ctx.fillStyle = '#f8fafc';
+          ctx.font = 'bold 14px sans-serif';
+          ctx.fillText(pair.giver, padding + 16, y + 22);
+
+          // Arrow symbol
+          ctx.textAlign = 'center';
+          ctx.fillStyle = '#22c55e';
+          ctx.font = 'bold 16px sans-serif';
+          ctx.fillText('➜', cardWidth / 2, y + 22);
+
+          // Receiver text
+          ctx.textAlign = 'right';
+          ctx.fillStyle = '#4ade80';
+          ctx.font = 'bold 14px sans-serif';
+          ctx.fillText(pair.receiver, cardWidth - padding - 16, y + 22);
+        });
+
+        // Convert canvas to blob / data URL and download
+        canvas.toBlob((blob) => {
+          if (!blob) {
+            showToast("Failed to render image file");
+            return;
+          }
+          const url = URL.createObjectURL(blob);
+          const downloadLink = document.createElement('a');
+          downloadLink.download = 'secret-santa-results.png';
+          downloadLink.href = url;
+          document.body.appendChild(downloadLink);
+          downloadLink.click();
+          
+          setTimeout(() => {
+            document.body.removeChild(downloadLink);
+            URL.revokeObjectURL(url);
+          }, 200);
+
+          showToast("Image downloaded!");
+        }, 'image/png');
+
+      } catch (err) {
+        console.error("Image export error:", err);
+        showToast("Error generating image");
+      }
+    }
+
+    function escapeHTML(str) {
+      return str.replace(/[&<>'"]/g, 
+        tag => ({
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          "'": '&#39;',
+          '"': '&quot;'
+        }[tag] || tag)
+      );
+    }
+
+    // --- Listeners ---
+    addForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      addParticipant(nameInput.value);
+    });
+
+    nameInput.addEventListener('input', () => {
+      if (!inputError.classList.contains('hidden')) {
+        hideInputError();
+      }
+    });
+
+    clearAllBtn.addEventListener('click', clearAllParticipants);
+    drawBtn.addEventListener('click', performDraw);
+    redrawBtn.addEventListener('click', performDraw);
+    downloadImageBtn.addEventListener('click', exportResultsAsImage);
+    copyResultsBtn.addEventListener('click', copyResultsToClipboard);
+
+    modeSecretBtn.addEventListener('click', () => {
+      state.viewMode = 'secret';
+      modeSecretBtn.className = "px-3 py-1.5 rounded-lg font-semibold transition-all text-white bg-brand-600 shadow-sm flex items-center gap-1.5";
+      modeRevealBtn.className = "px-3 py-1.5 rounded-lg font-semibold transition-all text-slate-400 hover:text-white flex items-center gap-1.5";
+      renderResultsUI();
+    });
+
+    modeRevealBtn.addEventListener('click', () => {
+      state.viewMode = 'reveal';
+      modeRevealBtn.className = "px-3 py-1.5 rounded-lg font-semibold transition-all text-white bg-brand-600 shadow-sm flex items-center gap-1.5";
+      modeSecretBtn.className = "px-3 py-1.5 rounded-lg font-semibold transition-all text-slate-400 hover:text-white flex items-center gap-1.5";
+      renderResultsUI();
+    });
+
+    window.addEventListener('DOMContentLoaded', () => {
+      updateParticipantsUI();
+      initSnowAnimation();
+    });
+
+    // --- Falling Snowflake Canvas Animation Engine ---
+    function initSnowAnimation() {
+      const canvas = document.getElementById('snow-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+
+      let width = (canvas.width = window.innerWidth);
+      let height = (canvas.height = window.innerHeight);
+
+      window.addEventListener('resize', () => {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+      });
+
+      const flakeCount = Math.floor(Math.min(width, 1200) / 12);
+      const flakes = [];
+
+      for (let i = 0; i < flakeCount; i++) {
+        flakes.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          radius: Math.random() * 3 + 1.5,
+          speedY: Math.random() * 0.7 + 0.3,
+          speedX: Math.random() * 0.4 - 0.2,
+          swayStep: Math.random() * Math.PI * 2,
+          swaySpeed: Math.random() * 0.01 + 0.005,
+          swayRadius: Math.random() * 1.5 + 0.5,
+          opacity: Math.random() * 0.6 + 0.3,
+          branches: Math.random() > 0.45
+        });
+      }
+
+      function drawFlake(flake) {
+        ctx.save();
+        ctx.translate(flake.x, flake.y);
+        ctx.fillStyle = `rgba(255, 255, 255, ${flake.opacity})`;
+        ctx.strokeStyle = `rgba(255, 255, 255, ${flake.opacity})`;
+
+        if (flake.branches && flake.radius > 2.5) {
+          ctx.lineWidth = 0.8;
+          for (let i = 0; i < 6; i++) {
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(0, -flake.radius * 2);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(0, -flake.radius * 1.1);
+            ctx.lineTo(flake.radius * 0.6, -flake.radius * 1.6);
+            ctx.moveTo(0, -flake.radius * 1.1);
+            ctx.lineTo(-flake.radius * 0.6, -flake.radius * 1.6);
+            ctx.stroke();
+
+            ctx.rotate(Math.PI / 3);
+          }
+        } else {
+          ctx.beginPath();
+          ctx.arc(0, 0, flake.radius, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        ctx.restore();
+      }
+
+      function updateFlakes() {
+        ctx.clearRect(0, 0, width, height);
+
+        for (let i = 0; i < flakes.length; i++) {
+          const flake = flakes[i];
+
+          flake.swayStep += flake.swaySpeed;
+          flake.x += flake.speedX + Math.sin(flake.swayStep) * (flake.swayRadius * 0.3);
+          flake.y += flake.speedY;
+
+          if (flake.y > height + 10) {
+            flake.y = -10;
+            flake.x = Math.random() * width;
+          }
+          if (flake.x > width + 10) {
+            flake.x = -10;
+          } else if (flake.x < -10) {
+            flake.x = width + 10;
+          }
+
+          drawFlake(flake);
+        }
+
+        requestAnimationFrame(updateFlakes);
+      }
+
+      updateFlakes();
+    }
+  </script>
+</body>
+</html>
