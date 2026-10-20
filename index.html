@@ -91,6 +91,17 @@
 
   <div class="relative z-10 max-w-5xl mx-auto px-4 py-8 sm:px-6 lg:px-8 w-full flex-grow">
     
+    <!-- Top Bar with Language Selector -->
+    <div class="flex justify-end mb-4">
+      <button 
+        id="lang-toggle-btn" 
+        class="bg-slate-900/90 border border-slate-700/80 hover:border-brand-500 px-3.5 py-1.5 rounded-full text-xs font-semibold text-slate-200 hover:text-white transition-all shadow-lg flex items-center gap-2 active:scale-95"
+      >
+        <span id="lang-flag">🇬🇧</span>
+        <span id="lang-text">Français</span>
+      </button>
+    </div>
+
     <!-- App Header -->
     <header class="text-center mb-10">
       <h1 class="festive-title text-6xl sm:text-7xl lg:text-8xl font-black tracking-tight bg-gradient-to-r from-white via-emerald-400 to-red-500 bg-clip-text text-transparent mb-3 py-2">
@@ -104,7 +115,7 @@
       <!-- LEFT COLUMN: Input & List Management -->
       <section class="lg:col-span-5 bg-slate-900/80 backdrop-blur-md border border-slate-700/80 rounded-2xl p-6 shadow-2xl">
         <div class="flex items-center justify-between mb-4">
-          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+          <h2 id="i18n-participants" class="text-xl font-bold text-white flex items-center gap-2">
             <i class="fa-solid fa-users text-brand-400"></i>
             Participants
           </h2>
@@ -128,7 +139,7 @@
               type="submit" 
               class="absolute right-2 px-3.5 py-1.5 bg-brand-600 hover:bg-brand-500 text-white font-semibold text-sm rounded-lg transition-all shadow-md active:scale-95"
             >
-              <span>Add</span>
+              <span id="i18n-add-btn">Add</span>
             </button>
           </div>
           <!-- Validation Message Area -->
@@ -140,9 +151,9 @@
 
         <!-- List Header -->
         <div class="flex justify-between items-center text-xs mb-3 text-slate-400 px-1 font-medium">
-          <span>Participant List</span>
+          <span id="i18n-participant-list-title">Participant List</span>
           <button id="clear-all-btn" class="text-rose-400 hover:text-rose-300 transition-colors hidden font-semibold">
-            <i class="fa-solid fa-trash-can mr-1"></i> Clear All
+            <i class="fa-solid fa-trash-can mr-1"></i> <span id="i18n-clear-all">Clear All</span>
           </button>
         </div>
 
@@ -151,8 +162,8 @@
           <!-- Empty State -->
           <div id="empty-state" class="h-48 flex flex-col items-center justify-center text-slate-400 border-2 border-dashed border-slate-700/70 rounded-xl p-4 text-center">
             <i class="fa-solid fa-user-group text-3xl mb-2 opacity-60 text-indigo-300"></i>
-            <p class="text-sm font-semibold text-slate-300">No participants yet</p>
-            <p class="text-xs text-slate-400 mt-1">Add at least 2 people to draw pairs</p>
+            <p id="i18n-empty-title" class="text-sm font-semibold text-slate-300">No participants yet</p>
+            <p id="i18n-empty-subtitle" class="text-xs text-slate-400 mt-1">Add at least 3 people to draw pairs</p>
           </div>
         </div>
 
@@ -164,10 +175,10 @@
             class="w-full py-3.5 px-4 bg-gradient-to-r from-brand-600 to-emerald-500 hover:from-brand-500 hover:to-emerald-400 text-white font-bold rounded-xl shadow-lg shadow-brand-950/40 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none flex items-center justify-center gap-2 text-base active:scale-[0.99]"
           >
             <i class="fa-solid fa-shuffle"></i>
-            <span>Draw Secret Santa Pairs</span>
+            <span id="i18n-draw-btn">Draw Secret Santa Pairs</span>
           </button>
           <p id="draw-hint" class="text-xs text-slate-400 text-center mt-2 font-medium">
-            Add at least 2 participants to start the draw.
+            Add at least 3 participants to start the draw.
           </p>
         </div>
       </section>
@@ -179,11 +190,11 @@
           <!-- Results Header & Controls -->
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 pb-4 border-b border-slate-800">
             <div>
-              <h2 class="text-xl font-bold text-white flex items-center gap-2">
+              <h2 id="i18n-results-title" class="text-xl font-bold text-white flex items-center gap-2">
                 <i class="fa-solid fa-square-poll-vertical text-brand-400"></i>
                 Draw Results
               </h2>
-              <p class="text-xs text-slate-400 mt-0.5">Matched strictly 1-to-1 with no self-draws</p>
+              <p id="i18n-results-subtitle" class="text-xs text-slate-400 mt-0.5">Matched strictly 1-to-1 with no self-draws</p>
             </div>
 
             <!-- Display Mode Switcher -->
@@ -193,14 +204,14 @@
                 class="px-3 py-1.5 rounded-lg font-semibold transition-all text-white bg-brand-600 shadow-sm flex items-center gap-1.5"
               >
                 <i class="fa-solid fa-eye-slash"></i>
-                <span>Secret Cards</span>
+                <span id="i18n-secret-mode">Secret Cards</span>
               </button>
               <button 
                 id="mode-reveal-btn" 
                 class="px-3 py-1.5 rounded-lg font-semibold transition-all text-slate-400 hover:text-white flex items-center gap-1.5"
               >
                 <i class="fa-solid fa-list-check"></i>
-                <span>Show All</span>
+                <span id="i18n-show-all-mode">Show All</span>
               </button>
             </div>
           </div>
@@ -210,9 +221,9 @@
             <div class="w-16 h-16 rounded-full bg-slate-800/80 border border-slate-700 flex items-center justify-center mb-3">
               <i class="fa-solid fa-wand-magic-sparkles text-2xl text-indigo-300"></i>
             </div>
-            <h3 class="text-base font-semibold text-slate-200">Ready to Draw</h3>
-            <p class="text-xs text-slate-400 max-w-xs mt-1">
-              Add your group list on the left and hit "Draw Secret Santa Pairs" to generate random assignments.
+            <h3 id="i18n-ready-title" class="text-base font-semibold text-slate-200">Ready to Draw</h3>
+            <p id="i18n-ready-desc" class="text-xs text-slate-400 max-w-xs mt-1">
+              Add your group list above and hit "Draw Secret Santa Pairs" to generate random assignments.
             </p>
           </div>
 
@@ -234,7 +245,7 @@
         <div id="results-footer" class="hidden pt-5 border-t border-slate-800 mt-6 flex flex-wrap items-center justify-between gap-3">
           <div class="text-xs text-slate-400 flex items-center gap-1.5">
             <i class="fa-solid fa-circle-check text-brand-400"></i>
-            <span>Valid 1-to-1 draw complete</span>
+            <span id="i18n-valid-draw">Valid 1-to-1 draw complete</span>
           </div>
 
           <div class="flex items-center gap-2">
@@ -243,21 +254,21 @@
               class="px-3.5 py-2 bg-brand-600 hover:bg-brand-500 text-white text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5 active:scale-95 shadow-sm"
             >
               <i class="fa-solid fa-file-image"></i>
-              <span>Save as Image</span>
+              <span id="i18n-save-img">Save as Image</span>
             </button>
             <button 
               id="copy-results-btn" 
               class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5 active:scale-95 shadow-sm"
             >
               <i class="fa-solid fa-copy"></i>
-              <span>Copy List</span>
+              <span id="i18n-copy-list">Copy List</span>
             </button>
             <button 
               id="redraw-btn" 
               class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5 active:scale-95 shadow-sm"
             >
               <i class="fa-solid fa-rotate-right"></i>
-              <span>Reshuffle</span>
+              <span id="i18n-reshuffle">Reshuffle</span>
             </button>
           </div>
         </div>
@@ -279,20 +290,105 @@
   </div>
 
   <!-- Footer -->
-  <footer class="text-center py-6 text-xs text-slate-400 border-t border-slate-900 mt-12 font-medium relative z-10">
-    Secret Santa Generator &bull; Secure Client-Side Derangement Draw
+  <footer id="i18n-footer" class="text-center py-6 text-xs text-slate-400 border-t border-slate-900 mt-12 font-medium relative z-10">
+    Built with ❤️ and ☕ by Daniellyson & Gemini
   </footer>
 
   <!-- App JavaScript Logic -->
   <script>
+    // --- Translations Dictionary ---
+    const translations = {
+      en: {
+        toggleBtnText: "Français",
+        toggleFlag: "🇫🇷",
+        placeholder: "Enter a name (e.g., Dan)",
+        participantsTitle: "Participants",
+        addedSuffix: "added",
+        addBtn: "Add",
+        participantListTitle: "Participant List",
+        clearAll: "Clear All",
+        emptyTitle: "No participants yet",
+        emptySubtitle: "Add at least 3 people to draw pairs",
+        drawBtn: "Draw Secret Santa Pairs",
+        drawHintMin: "Add at least 3 participants to start the draw.",
+        drawHintReady: (n) => `Ready! Draw pairs for ${n} participants.`,
+        resultsTitle: "Draw Results",
+        resultsSubtitle: "Matched strictly 1-to-1 with no self-draws",
+        secretMode: "Secret Cards",
+        showAllMode: "Show All",
+        readyTitle: "Ready to Draw",
+        readyDesc: "Add your group list above and hit \"Draw Secret Santa Pairs\" to generate random assignments.",
+        validDraw: "Valid 1-to-1 draw complete",
+        saveImg: "Save as Image",
+        copyList: "Copy List",
+        reshuffle: "Reshuffle",
+        footer: "Built with ❤️ and ☕ by Daniellyson & Gemini",
+        errEmptyName: "Please enter a name.",
+        errDuplicateName: "This name is already added.",
+        tapToReveal: "Tap to reveal",
+        givesToQuestion: "Gives to ... ?",
+        drawnStatus: "Drawn",
+        givesAGiftTo: "Gives a gift to",
+        toastCleared: "Cleared all participants",
+        toastDrawn: "Secret Santa pairs drawn!",
+        toastCopied: "Results copied to clipboard!",
+        toastImgDownloaded: "Image downloaded!",
+        exportTitle: "🎁 Secret Santa Pairings",
+        exportSubtitle: "Official Pairings List"
+      },
+      fr: {
+        toggleBtnText: "English",
+        toggleFlag: "🇬🇧",
+        placeholder: "Entrez un nom (ex. Dan)",
+        participantsTitle: "Participants",
+        addedSuffix: "ajouté(s)",
+        addBtn: "Ajouter",
+        participantListTitle: "Liste des participants",
+        clearAll: "Tout effacer",
+        emptyTitle: "Aucun participant pour l'instant",
+        emptySubtitle: "Ajoutez au moins 3 personnes pour le tirage",
+        drawBtn: "Tirer au sort les paires",
+        drawHintMin: "Ajoutez au moins 3 participants pour commencer.",
+        drawHintReady: (n) => `Prêt ! Tirage au sort pour ${n} participants.`,
+        resultsTitle: "Résultats du tirage",
+        resultsSubtitle: "Attribué strictly 1-à-1 sans auto-tirage",
+        secretMode: "Cartes Secrètes",
+        showAllMode: "Afficher Tout",
+        readyTitle: "Prêt pour le tirage",
+        readyDesc: "Ajoutez votre liste de participants ci-dessus et cliquez sur « Tirer au sort les paires » pour générer les tirages.",
+        validDraw: "Tirage 1-à-1 valide effectué",
+        saveImg: "Sauvegarder en image",
+        copyList: "Copier la liste",
+        reshuffle: "Mélanger à nouveau",
+        footer: "Built with ❤️ and ☕ by Daniellyson & Gemini",
+        errEmptyName: "Veuillez entrer un nom.",
+        errDuplicateName: "Ce nom a déjà été ajouté.",
+        tapToReveal: "Cliquer pour révéler",
+        givesToQuestion: "Offre à ... ?",
+        drawnStatus: "Tiré",
+        givesAGiftTo: "Offre un cadeau à",
+        toastCleared: "Tous les participants ont été effacés",
+        toastDrawn: "Pairs tirées avec succès !",
+        toastCopied: "Résultats copiés dans le presse-papier !",
+        toastImgDownloaded: "Image téléchargée !",
+        exportTitle: "🎁 Tirage Secret Santa",
+        exportSubtitle: "Liste officielle des cadeaux"
+      }
+    };
+
     // --- Application State ---
     const state = {
+      lang: 'en',
       participants: [],
       pairs: [], // Array of objects: { giver: string, receiver: string, revealed: boolean }
       viewMode: 'secret' // 'secret' | 'reveal'
     };
 
     // --- DOM Elements ---
+    const langToggleBtn = document.getElementById('lang-toggle-btn');
+    const langFlag = document.getElementById('lang-flag');
+    const langText = document.getElementById('lang-text');
+
     const addForm = document.getElementById('add-name-form');
     const nameInput = document.getElementById('name-input');
     const inputError = document.getElementById('input-error');
@@ -317,9 +413,42 @@
     const toast = document.getElementById('toast');
     const toastMessage = document.getElementById('toast-message');
 
+    // --- Language Translation Function ---
+    function updateLanguageUI() {
+      const t = translations[state.lang];
+
+      langFlag.textContent = t.toggleFlag;
+      langText.textContent = t.toggleBtnText;
+      nameInput.placeholder = t.placeholder;
+
+      document.getElementById('i18n-participants').childNodes[2].textContent = ` ${t.participantsTitle}`;
+      document.getElementById('i18n-add-btn').textContent = t.addBtn;
+      document.getElementById('i18n-participant-list-title').textContent = t.participantListTitle;
+      document.getElementById('i18n-clear-all').textContent = t.clearAll;
+      document.getElementById('i18n-empty-title').textContent = t.emptyTitle;
+      document.getElementById('i18n-empty-subtitle').textContent = t.emptySubtitle;
+      document.getElementById('i18n-draw-btn').textContent = t.drawBtn;
+      document.getElementById('i18n-results-title').childNodes[2].textContent = ` ${t.resultsTitle}`;
+      document.getElementById('i18n-results-subtitle').textContent = t.resultsSubtitle;
+      document.getElementById('i18n-secret-mode').textContent = t.secretMode;
+      document.getElementById('i18n-show-all-mode').textContent = t.showAllMode;
+      document.getElementById('i18n-ready-title').textContent = t.readyTitle;
+      document.getElementById('i18n-ready-desc').textContent = t.readyDesc;
+      document.getElementById('i18n-valid-draw').textContent = t.validDraw;
+      document.getElementById('i18n-save-img').textContent = t.saveImg;
+      document.getElementById('i18n-copy-list').textContent = t.copyList;
+      document.getElementById('i18n-reshuffle').textContent = t.reshuffle;
+      document.getElementById('i18n-footer').textContent = t.footer;
+
+      updateParticipantsUI();
+      if (state.pairs.length > 0) {
+        renderResultsUI();
+      }
+    }
+
     // --- Strict Derangement Draw Algorithm ---
     function generateDerangement(arr) {
-      if (arr.length < 2) return null;
+      if (arr.length < 3) return null;
 
       const givers = [...arr];
       let receivers = [...arr];
@@ -378,7 +507,8 @@
     }
 
     function updateParticipantsUI() {
-      participantCount.textContent = `${state.participants.length} added`;
+      const t = translations[state.lang];
+      participantCount.textContent = `${state.participants.length} ${t.addedSuffix}`;
       namesContainer.innerHTML = '';
 
       if (state.participants.length === 0) {
@@ -412,13 +542,13 @@
         });
       }
 
-      if (state.participants.length >= 2) {
+      if (state.participants.length >= 3) {
         drawBtn.disabled = false;
-        drawHint.textContent = `Ready! Draw pairs for ${state.participants.length} participants.`;
+        drawHint.textContent = t.drawHintReady(state.participants.length);
         drawHint.className = "text-xs text-brand-400 text-center mt-2 font-medium";
       } else {
         drawBtn.disabled = true;
-        drawHint.textContent = "Add at least 2 participants to start the draw.";
+        drawHint.textContent = t.drawHintMin;
         drawHint.className = "text-xs text-slate-400 text-center mt-2 font-medium";
       }
     }
@@ -449,6 +579,7 @@
     }
 
     function renderSecretCards() {
+      const t = translations[state.lang];
       secretCardsGrid.innerHTML = '';
       state.pairs.forEach((pair, idx) => {
         const card = document.createElement('div');
@@ -459,21 +590,21 @@
             <div class="absolute inset-0 w-full h-full bg-slate-950/90 border border-slate-700/80 rounded-xl p-4 flex flex-col justify-between backface-hidden shadow-md hover:border-brand-500/60 transition-colors">
               <div class="flex items-center justify-between text-xs text-slate-400">
                 <span class="font-semibold text-slate-200">${escapeHTML(pair.giver)}</span>
-                <span class="bg-slate-800 border border-slate-700 px-2 py-0.5 rounded text-[10px] uppercase font-bold text-slate-300">Tap to reveal</span>
+                <span class="bg-slate-800 border border-slate-700 px-2 py-0.5 rounded text-[10px] uppercase font-bold text-slate-300">${t.tapToReveal}</span>
               </div>
               <div class="text-center py-1">
                 <i class="fa-solid fa-gift text-2xl text-brand-400 animate-pulse"></i>
               </div>
-              <div class="text-[11px] text-slate-400 text-center">Gives to ... ?</div>
+              <div class="text-[11px] text-slate-400 text-center">${t.givesToQuestion}</div>
             </div>
 
             <div class="absolute inset-0 w-full h-full bg-slate-900 border border-brand-500/60 rounded-xl p-4 flex flex-col justify-between backface-hidden rotate-y-180 shadow-lg">
               <div class="flex items-center justify-between text-xs text-slate-400">
                 <span class="font-semibold text-slate-200">${escapeHTML(pair.giver)}</span>
-                <span class="text-brand-400 text-xs"><i class="fa-solid fa-circle-check"></i> Drawn</span>
+                <span class="text-brand-400 text-xs"><i class="fa-solid fa-circle-check"></i> ${t.drawnStatus}</span>
               </div>
               <div class="text-center my-auto">
-                <span class="text-xs text-slate-400 block mb-0.5">Gives a gift to</span>
+                <span class="text-xs text-slate-400 block mb-0.5">${t.givesAGiftTo}</span>
                 <span class="text-lg font-bold text-brand-400">${escapeHTML(pair.receiver)}</span>
               </div>
             </div>
@@ -519,13 +650,14 @@
     // --- Logic & Event Handlers ---
 
     function addParticipant(name) {
+      const t = translations[state.lang];
       const trimmed = name.trim();
       if (!trimmed) {
-        showInputError("Please enter a name.");
+        showInputError(t.errEmptyName);
         return;
       }
       if (state.participants.some(p => p.toLowerCase() === trimmed.toLowerCase())) {
-        showInputError("This name is already added.");
+        showInputError(t.errDuplicateName);
         return;
       }
 
@@ -543,29 +675,32 @@
     }
 
     function clearAllParticipants() {
+      const t = translations[state.lang];
       state.participants = [];
       state.pairs = [];
       updateParticipantsUI();
       renderResultsUI();
-      showToast("Cleared all participants");
+      showToast(t.toastCleared);
     }
 
     function performDraw() {
-      if (state.participants.length < 2) return;
+      const t = translations[state.lang];
+      if (state.participants.length < 3) return;
 
       const pairs = generateDerangement(state.participants);
       if (pairs) {
         state.pairs = pairs;
         renderResultsUI();
-        showToast("Secret Santa pairs drawn!");
+        showToast(t.toastDrawn);
       }
     }
 
     function copyResultsToClipboard() {
+      const t = translations[state.lang];
       if (state.pairs.length === 0) return;
 
       const lines = state.pairs.map(p => `${p.giver} ➔ ${p.receiver}`);
-      const textToCopy = `🎁 Secret Santa Assignments 🎁\n\n` + lines.join('\n');
+      const textToCopy = `🎁 ${t.resultsTitle} 🎁\n\n` + lines.join('\n');
 
       const dummy = document.createElement("textarea");
       document.body.appendChild(dummy);
@@ -574,15 +709,13 @@
       document.execCommand("copy");
       document.body.removeChild(dummy);
 
-      showToast("Results copied to clipboard!");
+      showToast(t.toastCopied);
     }
 
     // --- Native 2D Canvas Image Exporter ---
     function exportResultsAsImage() {
-      if (!state.pairs || state.pairs.length === 0) {
-        showToast("No pairs available to export");
-        return;
-      }
+      const t = translations[state.lang];
+      if (!state.pairs || state.pairs.length === 0) return;
 
       try {
         const cardWidth = 600;
@@ -595,10 +728,7 @@
         canvas.width = cardWidth * 2;
         canvas.height = cardHeight * 2;
         const ctx = canvas.getContext('2d');
-        if (!ctx) {
-          showToast("Canvas context error");
-          return;
-        }
+        if (!ctx) return;
 
         ctx.scale(2, 2);
 
@@ -609,7 +739,7 @@
         ctx.fillStyle = bgGradient;
         ctx.fillRect(0, 0, cardWidth, cardHeight);
 
-        // Card Outer Border
+        // Outer Border
         ctx.strokeStyle = '#334155';
         ctx.lineWidth = 2;
         ctx.strokeRect(10, 10, cardWidth - 20, cardHeight - 20);
@@ -618,19 +748,18 @@
         ctx.fillStyle = '#22c55e';
         ctx.font = 'bold 26px sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText('🎁 Secret Santa Pairings', cardWidth / 2, 54);
+        ctx.fillText(t.exportTitle, cardWidth / 2, 54);
 
         // Subtitle
         ctx.fillStyle = '#94a3b8';
         ctx.font = '13px sans-serif';
-        ctx.fillText('Official Pairings List', cardWidth / 2, 78);
+        ctx.fillText(t.exportSubtitle, cardWidth / 2, 78);
 
         // Pair Rows
         const startY = headerHeight;
         state.pairs.forEach((pair, idx) => {
           const y = startY + (idx * rowHeight);
 
-          // Row background box
           ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
           ctx.strokeStyle = '#334155';
           ctx.lineWidth = 1;
@@ -657,12 +786,9 @@
           ctx.fillText(pair.receiver, cardWidth - padding - 16, y + 22);
         });
 
-        // Convert canvas to blob / data URL and download
+        // Trigger PNG Download
         canvas.toBlob((blob) => {
-          if (!blob) {
-            showToast("Failed to render image file");
-            return;
-          }
+          if (!blob) return;
           const url = URL.createObjectURL(blob);
           const downloadLink = document.createElement('a');
           downloadLink.download = 'secret-santa-results.png';
@@ -675,12 +801,11 @@
             URL.revokeObjectURL(url);
           }, 200);
 
-          showToast("Image downloaded!");
+          showToast(t.toastImgDownloaded);
         }, 'image/png');
 
       } catch (err) {
         console.error("Image export error:", err);
-        showToast("Error generating image");
       }
     }
 
@@ -696,7 +821,13 @@
       );
     }
 
-    // --- Listeners ---
+    // --- Event Listeners ---
+
+    langToggleBtn.addEventListener('click', () => {
+      state.lang = state.lang === 'en' ? 'fr' : 'en';
+      updateLanguageUI();
+    });
+
     addForm.addEventListener('submit', (e) => {
       e.preventDefault();
       addParticipant(nameInput.value);
@@ -729,7 +860,7 @@
     });
 
     window.addEventListener('DOMContentLoaded', () => {
-      updateParticipantsUI();
+      updateLanguageUI();
       initSnowAnimation();
     });
 
